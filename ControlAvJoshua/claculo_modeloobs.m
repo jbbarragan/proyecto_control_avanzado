@@ -39,20 +39,20 @@ D=[0 0
 
 %Diseño de control LQR
 
-Q = [900 0 0 0
-0 80 0 0
-0 0 0 0
-0 0 0 0]
+Q = [270 0 0 0
+      0 80 0 0
+      0 0 1 0
+      0 0 0 1]
 
-R = [0.02 0
-0 0.02];
+R = [0.1 0
+      0   0.05];
 K_lqr = lqr(A_modelo, B_modelo, Q, R)
 A_cl = A_modelo - B_modelo*K_lqr;
 
 eig(A_cl)
 
 %Polos
-p=110;
+p=200;
 
 %Polinomio del observador
 
