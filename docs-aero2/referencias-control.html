@@ -1,0 +1,17 @@
+---
+layout: default
+title: "3. Referencias y saturación"
+nav_order: 4
+---
+<article class="report">
+<h1>3. Seguimiento de referencias y límites</h1><p>El script calcula un regulador. En el diagrama, la referencia incluye ángulos deseados y velocidades deseadas nulas. Si el sumador entrega xd − x y el bloque Gain contiene K_lqr con multiplicación matricial, entonces:</p>
+<div class="equation">\[x_d=[\theta_d,\psi_d,0,0]^T,\qquad u_{cmd}=K(x_d-x)\]</div>
+<p>La combinación de signos es esencial: usar −K después de un sumador xd − x invertiría la realimentación. El producto requerido es una matriz 2×4 por un vector 4×1. La etiqueta K*u del bloque es coherente con esa operación; los parámetros deben verificarse en el archivo real.</p>
+<h2>Por qué una referencia no nula puede dejar error</h2><p>En equilibrio debe cumplirse Axss + Buss = 0. Si se impone x = xd y se utiliza únicamente K(xd − x), el voltaje se hace cero. Sin embargo, un pitch deseado distinto de cero requiere compensar Ksp θd en este modelo. Por ello, esa ley no asegura seguimiento exacto de cualquier ángulo.</p>
+<div class="equation">\[u=-Kx+\overline N r,\qquad \overline N=-[C(A-BK)^{-1}B]^{-1}\]</div>
+<p>El prefiltro anterior permite seguimiento nominal de referencias constantes si la matriz invertida es no singular. Otra formulación usa estados y entradas de equilibrio: u = uss − K(x − xss). La acción integral del error puede corregir desviaciones persistentes por incertidumbre, pero requiere rediseño y manejo de saturación. Estas opciones son <strong>propuestas</strong>; no aparecen en el script entregado ni se afirman implementadas.</p>
+<h2>Saturador de ±24 V</h2>
+<div class="equation">\[u_i=\min(24,\max(-24,u_{cmd,i}))\]</div>
+<p>El bloque rotulado ±24V coincide con el rango de salida analógica documentado para el Aero 2 [3]. El máximo de la interfaz no implica que cualquier ensayo deba mantenerse a ese nivel. Una vez recortado el comando, la dinámica ya no coincide con A − BK y dejan de aplicarse directamente las propiedades óptimas del problema LQR sin restricciones.</p><p>Las mesetas de la figura 3 evidencian que el recorte interviene durante el transitorio. Para evaluar su importancia deben guardarse tanto ucmd como u aplicado. Una gráfica únicamente posterior al saturador no informa cuánto excedió el controlador el límite. Reducir amplitud o rapidez de la referencia y estudiar pesos mayores en R son alternativas de ajuste; no sustituyen la verificación del modelo y del sentido de realimentación.</p>
+<h2>Voltaje y corriente son variables diferentes</h2><p>El comando es voltaje; la corriente se mide por canales analógicos. No existe una igualdad i = u/R_lqr: la matriz de costo R no es una resistencia eléctrica. La corriente depende de la dinámica del motor, su fuerza contraelectromotriz y carga. Las lecturas firmadas y los cambios de signo deben interpretarse con la convención del sensor; no se infiere una dirección de giro solo a partir de estas capturas.</p>
+</article>

@@ -1,0 +1,65 @@
+---
+layout: default
+title: "7. Código y descargas"
+nav_order: 8
+---
+<article class="report">
+<h1>7. Código y archivos del proyecto</h1><p>El archivo principal conserva el cálculo y los parámetros del código proporcionado. Se añadieron comentarios de identificación y requisitos, sin modificar Q, R, p ni las ecuaciones. MATLAB requiere Control System Toolbox y Symbolic Math Toolbox; el modelo físico requiere además Simulink y la instalación compatible de QUARC.</p>
+<div class="downloads"><a class="btn" download href="{{ '/assets/downloads/AERO2_LQR_OBSERVADOR.m' | relative_url }}">Descargar MATLAB .m</a><a class="btn" download href="{{ '/assets/downloads/VERIFICAR_AERO2.m' | relative_url }}">Descargar verificaciones .m</a>
+{% if site.simulink_ready %}<a class="btn" download href="{{ '/assets/downloads/AERO2_LQR_OBSERVADOR.slx' | relative_url }}">Descargar Simulink .slx</a>{% else %}<span class="pending">Simulink: incorpora el .slx actual al instalar el sitio.</span>{% endif %}</div>
+<p>El .slx no se reconstruyó a partir de una imagen. El instalador incorpora el archivo actual seleccionado del repositorio y activa su descarga. Las capturas permiten visualizar su arquitectura desde la sección 5; un .slx no se ejecuta en el navegador.</p>
+<h2>Script completo</h2><button type="button" class="btn" id="copy-code">Copiar código</button><span id="copy-status" role="status"></span><pre class="code-view"><code id="matlab-source">%% Quanser Aero 2: LQR y observador de tercer orden
+% Universidad Iberoamericana Ciudad de Mexico
+% Autores: Joshua Barragan, Rodrigo Bartolo, Harold David Perez Garcia,
+% Luis Roberto Cruz Caos.
+% Transcripcion del codigo proporcionado el 8 de octubre de 2026.
+% Se conserva el modelo, Q, R, p y el procedimiento simbolico.
+% Requiere Control System Toolbox y Symbolic Math Toolbox.
+clear; clc;
+syms s beta l m p
+Ksp=0.0130;
+Jp=0.0231885;
+Dp=0.00266;
+Dy=0.00175;
+Jy=0.0238104;
+Dt=0.16743;
+Kpp=0.00323;
+Kpy=0.00149;
+Kyy=0.00571;
+Kyp=-0.00235;
+A_modelo=[0 0 1 0
+0 0 0 1
+-(Ksp)/(Jp) 0 -(Dp)/(Jp) 0
+0 0 0 -(Dy)/(Jy)];
+B_modelo = [0 0
+0 0
+(Dt*Kpp)/(Jp) (Dt*Kpy)/(Jp)
+(Dt*Kyp)/(Jy) (Dt*Kyy)/(Jy)];
+C=[1 0 0 0
+0 1 0 0];
+D=[0 0
+0 0];
+Q = [270 0 0 0
+      0 80 0 0
+      0 0 1 0
+      0 0 0 1]
+R = [0.1 0
+      0   0.05];
+K_lqr = lqr(A_modelo, B_modelo, Q, R)
+A_cl = A_modelo - B_modelo*K_lqr;
+eig(A_cl)
+p=200;
+pol_obs = s^3 + beta*s^2 + l*s + (l*beta + m)
+pol_des = expand((s + p)^3);
+coef_obs = coeffs(pol_obs, s, &#x27;All&#x27;);
+coef_des = coeffs(pol_des, s, &#x27;All&#x27;);
+eq1 = coef_obs(2) == coef_des(2);
+eq2 = coef_obs(3) == coef_des(3);
+eq3 = coef_obs(4) == coef_des(4);
+solucion = solve([eq1, eq2, eq3], [beta, l, m])
+beta = double(solucion.beta);
+l = double(solucion.l);
+m = double(solucion.m);
+</code></pre>
+<h2>Qué hace cada parte</h2><ol><li><code>clear; clc;</code> limpia variables y consola; no inicia el equipo.</li><li><code>syms</code> declara símbolos para igualar polinomios.</li><li>Los parámetros construyen las matrices del modelo nominal.</li><li><code>lqr</code> obtiene la ganancia K; <code>eig</code> verifica los polos nominales.</li><li><code>p=200</code> fija la magnitud del polo deseado del estimador.</li><li><code>coeffs</code> y <code>solve</code> igualan coeficientes y resuelven β, l y m.</li><li><code>double</code> transforma las soluciones simbólicas en números para Simulink.</li></ol><p>Una alternativa algebraicamente equivalente al bloque simbólico es <code>beta=3*p; l=3*p^2; m=-8*p^3;</code>. Se mantiene el procedimiento original para mostrar su justificación.</p>
+</article>
