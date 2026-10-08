@@ -1,0 +1,14 @@
+title: "Aero 2 · IBERO"
+description: "Control LQR de pitch y yaw con observador de tercer orden. Universidad Iberoamericana Ciudad de México."
+theme: just-the-docs
+color_scheme: dark
+lang: es
+url: ""
+baseurl: ""
+search_enabled: true
+heading_anchors: true
+back_to_top: true
+back_to_top_text: "Volver arriba"
+footer_content: "Universidad Iberoamericana Ciudad de México · Control Avanzado y Robótica · 2026"
+simulink_ready: true
+exclude: [Gemfile, Gemfile.lock, vendor, README.md]

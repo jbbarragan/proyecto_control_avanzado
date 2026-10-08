@@ -1,0 +1,22 @@
+---
+layout: default
+title: "2. LQR: Q, R y ganancias"
+nav_order: 3
+---
+<article class="report">
+<h1>2. Diseño LQR</h1><p>El regulador lineal cuadrático selecciona una realimentación constante que minimiza un costo acumulado para el modelo lineal, sin saturación. En regulación al origen:</p>
+<div class="equation">\[J=\int_0^\infty(x^TQx+u^TRu)\,dt,\qquad u=-Kx\]</div>
+<p>Q y R son pesos de diseño; no son señales medidas. En este trabajo son diagonales, de modo que no se introducen productos cruzados dentro del costo. Esto no elimina los acoplamientos físicos de B ni los términos cruzados de K. La definición y sintaxis de <code>lqr</code> se documentan en [1].</p>
+<h2>Q: qué estados se penalizan</h2>
+<div class="equation">\[Q=\operatorname{diag}(270,80,1,1)\]</div><div class="table-scroll"><table><thead><tr><th>Entrada</th><th>Señal</th><th>Efecto buscado al aumentar el peso</th></tr></thead><tbody><tr><td>Q11 = 270</td><td>Pitch θ</td><td>Reducir desviaciones de pitch; puede demandar más comando</td></tr><tr><td>Q22 = 80</td><td>Yaw ψ</td><td>Reducir desviaciones de yaw</td></tr><tr><td>Q33 = 1</td><td>Velocidad de pitch θ̇</td><td>Penalizar movimiento rápido de pitch</td></tr><tr><td>Q44 = 1</td><td>Velocidad de yaw ψ̇</td><td>Penalizar movimiento rápido de yaw</td></tr></tbody></table></div><div class="equation">\[x^TQx=270\theta^2+80\psi^2+\dot\theta^2+\dot\psi^2\]</div>
+<p>Para errores angulares del mismo tamaño en radianes, pitch contribuye 3.375 veces lo que contribuye yaw. Esto no significa que pitch responda 3.375 veces más rápido: la respuesta también depende de inercias, acoplamientos y R. Comparar pesos de posición con pesos de velocidad sin considerar unidades y escalas tampoco equivale a comparar prioridades absolutas.</p><p>Con θ = ψ = 0.1 rad y velocidades nulas, la contribución instantánea del estado al costo es 2.7 + 0.8 = 3.5. Al aumentar los pesos de velocidad suele favorecerse una respuesta menos acelerada u oscilatoria, pero el resultado debe evaluarse recalculando K y simulando el sistema acoplado.</p>
+<h2>R: esfuerzo de los dos motores</h2>
+<div class="equation">\[R=\begin{bmatrix}0.1&0\\0&0.05\end{bmatrix},\qquad u^TRu=0.1u_p^2+0.05u_y^2\]</div>
+<p>A igual voltaje, la primera entrada aporta el doble de costo que la segunda. R pondera los dos <strong>actuadores</strong>, no los dos ángulos de forma independiente. Por el acoplamiento, ambos voltajes pueden corregir ambos ejes. Si ambos comandos valen 10 V, su costo instantáneo es 10 + 5 = 15.</p><div class="callout"><strong>Penalización no equivale a restricción.</strong> Aumentar R vuelve costoso el esfuerzo y suele reducir la agresividad; no garantiza |u| ≤ 24 V, ni limita directamente corriente. El bloque Saturation es quien recorta el comando. El LQR estándar no resuelve un problema con límites duros.</div>
+<p>Multiplicar Q y R por la misma constante positiva no cambia la ganancia óptima: escala todo el costo. Modificar solo R o solo parte de Q sí cambia el balance. Un criterio inicial de normalización consiste en usar pesos inversamente proporcionales al cuadrado de las desviaciones y comandos aceptables; después se verifica desempeño con unidades consistentes [2].</p>
+<h2>Riccati y ganancia resultante</h2>
+<div class="equation">\[A^TP+PA-PBR^{-1}B^TP+Q=0,\qquad K=R^{-1}B^TP\]</div><div class="equation">\[K\approx\begin{bmatrix}31.383781&-11.071493&44.207968&-13.258234\\22.718711&36.808207&22.401847&38.482839\end{bmatrix}\]</div>
+<p>P es la solución estabilizante de Riccati; no es el parámetro minúsculo p del observador. La primera fila de K produce el primer voltaje y la segunda el segundo. Las cuatro columnas multiplican pitch, yaw y sus respectivas velocidades, en ese orden.</p>
+<div class="equation">\[\lambda(A-BK)\approx\{-0.705032\pm j0.984735,\ -0.907200\pm j0.938274\}\]</div>
+<p>Todos los polos nominales tienen parte real negativa. Sus partes imaginarias indican modos oscilatorios amortiguados. Esta comprobación describe el modelo continuo sin saturación; no demuestra estabilidad global del equipo real ni valida el algoritmo discretizado. Las condiciones estándar de LQR se satisfacen aquí con Q definida positiva, R definida positiva y un par (A,B) controlable.</p>
+</article>

@@ -1,0 +1,20 @@
+---
+layout: default
+title: "1. Modelo dinámico"
+nav_order: 2
+---
+<article class="report">
+<h1>1. Modelo dinámico y variables</h1><p>Pitch, θ, es la inclinación alrededor del eje de cabeceo. Yaw, ψ, es la rotación alrededor del eje de guiñada. El punto sobre una variable denota derivada temporal: θ̇ y ψ̇ son velocidades, no ángulos adicionales. Se adopta el orden exacto del script:</p>
+<div class="equation">\[x=[\theta,\ \psi,\ \dot\theta,\ \dot\psi]^T,\quad u=[u_p,\ u_y]^T,\quad y=[\theta,\ \psi]^T\]</div>
+<p>Los ángulos se expresan en radianes, las velocidades en rad/s y los comandos en voltios. Las variables del modelo lineal se interpretan como desviaciones alrededor de un equilibrio. La identificación de canales físicos, signos y orientación debe corresponder a la configuración real de las hélices y a las conversiones del diagrama.</p>
+<div class="equation">\[J_p\ddot\theta+D_p\dot\theta+K_{sp}\theta=D_tK_{pp}u_p+D_tK_{py}u_y\]</div><div class="equation">\[J_y\ddot\psi+D_y\dot\psi=D_tK_{yp}u_p+D_tK_{yy}u_y\]</div>
+<p>Estas ecuaciones son la forma diferencial equivalente de las matrices entregadas, no una identificación independiente. Las inercias relacionan torque y aceleración; Dp y Dy representan amortiguamiento viscoso; Ksp es la rigidez angular efectiva de pitch. Los términos cruzados Kpy y Kyp recogen el acoplamiento: cada motor puede influir en ambos ejes. El signo negativo de Kyp indica que, con la convención adoptada, su contribución al torque de yaw es opuesta.</p>
+<div class="table-scroll"><table><thead><tr><th>Parámetro</th><th>Valor</th><th>Interpretación en este modelo</th></tr></thead><tbody><tr><td>Jp</td><td>0.0231885</td><td>Inercia pitch, kg·m²</td></tr><tr><td>Jy</td><td>0.0238104</td><td>Inercia yaw, kg·m²</td></tr><tr><td>Dp / Dy</td><td>0.00266 / 0.00175</td><td>Amortiguamiento, N·m·s/rad</td></tr><tr><td>Ksp</td><td>0.0130</td><td>Rigidez efectiva, N·m/rad</td></tr><tr><td>Dt</td><td>0.16743</td><td>Brazo efectivo, m</td></tr><tr><td>Kpp / Kpy</td><td>0.00323 / 0.00149</td><td>Coeficientes de fuerza por voltaje para pitch</td></tr><tr><td>Kyp / Kyy</td><td>−0.00235 / 0.00571</td><td>Coeficientes de fuerza por voltaje para yaw</td></tr></tbody></table></div>
+<p>Las unidades de los coeficientes Kij se infieren de que Dt multiplica dichos coeficientes en B. Si su identificación original ya entrega torque por voltio, multiplicar por Dt nuevamente sería incorrecto; debe verificarse en la fuente experimental.</p>
+<div class="equation">\[\dot x=Ax+Bu,\qquad y=Cx+Du\]</div><div class="equation">\[A=\begin{bmatrix}0&0&1&0\\0&0&0&1\\-0.5606227&0&-0.1147120&0\\0&0&0&-0.0734973\end{bmatrix}\]</div><div class="equation">\[B=\begin{bmatrix}0&0\\0&0\\0.02332186&0.01075838\\-0.01652473&0.04015159\end{bmatrix},\quad C=\begin{bmatrix}1&0&0&0\\0&1&0&0\end{bmatrix},\quad D=0_{2\times2}\]</div>
+<p>Las primeras dos filas de A son relaciones cinemáticas. Las últimas contienen aceleraciones. B tiene ceros en las primeras filas porque el voltaje modifica primero la aceleración, no instantáneamente la posición. C selecciona los dos ángulos y D nula expresa ausencia de transmisión directa del voltaje al ángulo.</p>
+<h2>Controlabilidad y observabilidad</h2>
+<div class="equation">\[\mathcal C=[B\ AB\ A^2B\ A^3B],\qquad \mathcal O=\begin{bmatrix}C\\CA\\CA^2\\CA^3\end{bmatrix}\]</div>
+<p>Ambas matrices tienen rango 4 para los parámetros dados. El modelo es completamente controlable y observable. La observabilidad de (A,C) permite diseñar un observador basado en la planta, pero no convierte automáticamente cualquier filtro de ángulos en ese observador.</p>
+<h2>Hipótesis y límites</h2><p>El modelo supone parámetros constantes y comportamiento lineal local. Omite explícitamente dinámica eléctrica, saturación, fricción seca, holguras y dependencia no lineal del empuje con la velocidad de las hélices. Una excursión angular grande puede alejarse de su región de validez. El modelo tampoco contiene estados de corriente: no predice directamente los amperes de la figura 4.</p>
+</article>

@@ -1,0 +1,14 @@
+---
+layout: default
+title: "Presentación"
+nav_order: 1
+---
+<article class="report">
+<div class="hero"><div class="eyebrow">UNIVERSIDAD IBEROAMERICANA · CIUDAD DE MÉXICO</div><h1>Control de pitch y yaw<br><span>Quanser Aero 2</span></h1><p class="lead">Regulación LQR, estimación de estados y análisis de la implementación experimental en Simulink.</p><div class="tags"><span>Control Avanzado y Robótica</span><span>2 grados de libertad</span><span>Reporte técnico · 08.10.2026</span></div></div>
+<h2>Autoría y adscripción</h2><p>Joshua Barragán, Rodrigo Bartolo, Harold David Pérez García y Luis Roberto Cruz Caos.<br><strong>Universidad Iberoamericana Ciudad de México.</strong></p>
+<h2>Resumen</h2><p>Se documenta un controlador lineal cuadrático para un sistema de dos entradas y dos salidas, con estados de posición y velocidad angular de pitch y yaw. El diseño emplea un modelo lineal de cuatro estados, una matriz Q que pondera sus desviaciones y una matriz R que penaliza los voltajes de los motores. Se desarrolla además un estimador de tercer orden por canal angular mediante asignación de un polo real triple. El análisis incluye la arquitectura de Simulink, el significado físico de sus señales y la interpretación cualitativa de siete capturas aportadas por los autores.</p><p>El modelo nominal con las ganancias calculadas es estable en lazo cerrado. Las capturas exhiben oscilaciones, ruido en las velocidades y saturación del comando. Estos fenómenos impiden trasladar directamente la estabilidad y optimalidad del modelo lineal al experimento completo. La comparación entre yaw medido y observado es visual; no se dispone de registros numéricos sincronizados para calcular error, retardo o desempeño cuantitativo.</p>
+<div class="callout"><strong>Alcance de la evidencia.</strong> El reporte distingue cálculos derivados del código, observaciones de las imágenes y propuestas de mejora. La captura general muestra una rama de observación para comparación; no permite afirmar que los estados observados realimenten al LQR. No se presentan ensayos nuevos.</div>
+<h2>Objetivos</h2><ol><li>Explicar el modelo y la relación entre sus estados, entradas y salidas.</li><li>Justificar la función de Q y R y verificar los polos nominales.</li><li>Derivar el observador mostrado y explicar el ajuste de su rapidez.</li><li>Analizar críticamente las señales experimentales y facilitar su reproducción.</li></ol>
+<h2>Resultados de cálculo</h2><div class="metrics"><div><b>4 / 4</b><span>Rangos de controlabilidad y observabilidad</span></div><div><b>−0.705 ± j0.985</b><span>Par dominante del modelo con LQR</span></div><div><b>−200</b><span>Polo triple del observador continuo</span></div></div>
+<p>Las cifras se obtuvieron de las matrices publicadas en este reporte, mediante solución numérica de Riccati independiente de MATLAB. No constituyen métricas del equipo físico.</p>
+</article>
